@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    username: root
+    password:
+    url: jdbc:mysql:///activiti-demo?useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2B8
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+  activiti:
+    database-schema-update: true
