@@ -9,15 +9,31 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/">Activiti Demo</a>
+        <a class="navbar-brand" href="/">Activiti</a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
-          <li <#if page_tab == 'index'>class="active"</#if>>
-            <a href="/">My Tasks</a>
+          <#if _user?? && _user.rank == "员工">
+            <li <#if page_tab == 'myAskLeaves'>class="active"</#if>>
+              <a href="/myAskLeaves">我的请假</a>
+            </li>
+          </#if>
+          <li <#if page_tab == 'myTasks'>class="active"</#if>>
+            <a href="/task/list">我的任务</a>
           </li>
+          <#if _user?? && _user.rank == "管理员">
+          <li class="dropdown" <#if page_tab == 'workflow'>class="active"</#if>>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+               aria-expanded="false">工作流 <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/processDefinitions">流程定义列表</a></li>
+              <li><a href="/processInstances">流程实例列表</a></li>
+            </ul>
+          </li>
+          <li <#if page_tab == 'user'>class="active"</#if>><a href="/user/list">用户管理</a></li>
+          </#if>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <#if _user??>
@@ -25,15 +41,15 @@
               <a href="javascript:;">${_user.username}</a>
             </li>
             <li>
-              <a href="/logout">Logout</a>
+              <a href="/logout">登出</a>
             </li>
           <#else>
             <li <#if page_tab == 'login'>class="active"</#if>>
-              <a href="/login">Login</a>
+              <a href="/login">登录</a>
             </li>
-            <li <#if page_tab == 'register'>class="active"</#if>>
-              <a href="/register">Register</a>
-            </li>
+          <#--<li <#if page_tab == 'register'>class="active"</#if>>-->
+          <#--<a href="/register">注册</a>-->
+          <#--</li>-->
           </#if>
         </ul>
       </div>

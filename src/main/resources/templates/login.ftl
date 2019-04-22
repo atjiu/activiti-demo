@@ -3,19 +3,19 @@
   <div class="row">
     <div class="col-md-offset-3 col-md-6">
       <form action="" onsubmit="return;" method="post" role="form">
-        <legend>Login</legend>
+        <legend>登录</legend>
 
         <div class="form-group">
-          <label for="">Username</label>
-          <input type="text" class="form-control" name="uername" id="username" placeholder="Input...">
+          <label for="">用户名</label>
+          <input type="text" class="form-control" name="username" id="username" placeholder="用户名">
         </div>
         <div class="form-group">
-          <label for="">Password</label>
-          <input type="password" class="form-control" name="password" id="password" placeholder="Input...">
+          <label for="">密码</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="密码">
         </div>
 
 
-        <button type="button" id="btn" class="btn btn-primary">Submit</button>
+        <button type="button" id="btn" class="btn btn-primary">提交</button>
       </form>
 
     </div>

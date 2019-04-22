@@ -16,9 +16,10 @@
         <div class="form-group">
           <label for="">Rank</label>
           <select name="" id="rank" class="form-control">
-            <option value="Staff">Staff</option>
-            <option value="Division manager">Division manager</option>
-            <option value="General manager">General manager</option>
+            <option value="员工">员工</option>
+            <option value="部门经理">部门经理</option>
+            <option value="总经理">总经理</option>
+            <option value="管理员">管理员</option>
           </select>
         </div>
 

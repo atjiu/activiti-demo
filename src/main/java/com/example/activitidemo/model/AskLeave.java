@@ -7,23 +7,27 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
+/**
+ * Created by tomoya at 2019/4/22
+ */
 @Data
-public class User implements Serializable {
-  private static final long serialVersionUID = 8285221299464780129L;
+@Entity
+public class AskLeave implements Serializable {
+  private static final long serialVersionUID = 962824912139822725L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-  private String username;
-  private String password;
 
-  private String rank;
-
-  @ManyToOne
-  private User leader;
-
+  private String title;
+  private String description;
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date inTime;
+  private Integer day;
+  // 状态：创建, 提交, 放弃, 通过，拒绝
+  private String status;
+
+  @ManyToOne
+  private User user;
 
 }

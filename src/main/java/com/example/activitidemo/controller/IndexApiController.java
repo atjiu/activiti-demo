@@ -37,17 +37,17 @@ public class IndexApiController {
 
   @PostMapping("/login")
   public Object login(User user, HttpSession session) {
-    user = userService.save(user);
+    user = userService.login(user);
     session.setAttribute("_user", user);
     return user;
   }
 
-  @PostMapping("/register")
-  public Object register(User user, HttpSession session) {
-    user = userService.save(user);
-    session.setAttribute("_user", user);
-    return user;
-  }
+  //  @PostMapping("/register")
+  //  public Object register(User user, HttpSession session) {
+  //    user = userService.save(user);
+  //    session.setAttribute("_user", user);
+  //    return user;
+  //  }
 
   @PostMapping("/tasks")
   public Object tasks(HttpSession session) {
@@ -71,25 +71,25 @@ public class IndexApiController {
     return true;
   }
 
-  @PostMapping("/publishTask")
-  public Object publishTask(String taskId) {
-    // find next assignee
-    User division_manager = userService.findByRank("Division manager");
-    Map<String, Object> variables = new HashMap<>();
-    variables.put("username", division_manager.getUsername());
-    taskService.complete(taskId, variables);
-    return true;
-  }
-
-  @PostMapping("/firstReview")
-  public Object firstReview(String taskId) {
-    // find next assignee
-    User general_manager = userService.findByRank("General manager");
-    Map<String, Object> variables = new HashMap<>();
-    variables.put("username", general_manager.getUsername());
-    taskService.complete(taskId, variables);
-    return true;
-  }
+  //  @PostMapping("/publishTask")
+  //  public Object publishTask(String taskId) {
+  //    // find next assignee
+  //    User division_manager = userService.findByRank("Division manager");
+  //    Map<String, Object> variables = new HashMap<>();
+  //    variables.put("username", division_manager.getUsername());
+  //    taskService.complete(taskId, variables);
+  //    return true;
+  //  }
+  //
+  //  @PostMapping("/firstReview")
+  //  public Object firstReview(String taskId) {
+  //    // find next assignee
+  //    User general_manager = userService.findByRank("General manager");
+  //    Map<String, Object> variables = new HashMap<>();
+  //    variables.put("username", general_manager.getUsername());
+  //    taskService.complete(taskId, variables);
+  //    return true;
+  //  }
 
   @PostMapping("/lastReview")
   public Object lastReview(String taskId) {

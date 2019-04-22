@@ -7,5 +7,9 @@ spring:
     database: mysql
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   activiti:
     database-schema-update: true
+
+site:
+  ranks: ["员工", "部门经理", "总经理"]
