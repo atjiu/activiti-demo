@@ -41,6 +41,7 @@ public class AskLeaveApiController extends BaseController {
     AskLeave askLeave = askLeaveService.findById(id);
     Map<String, Object> variables = new HashMap<>();
     variables.put("username", askLeave.getUser().getUsername());
+    variables.put("pass", "1");
     runtimeService.startProcessInstanceByKey("AskLeave", String.valueOf(id), variables);
     // 更改请假状态
     askLeave.setStatus("提交");

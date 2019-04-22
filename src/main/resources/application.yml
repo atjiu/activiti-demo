@@ -8,6 +8,7 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: true
   activiti:
     database-schema-update: true
 

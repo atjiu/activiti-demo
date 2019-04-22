@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -42,7 +43,7 @@ public class UserService {
   }
 
   public List<User> findLeaders() {
-    return userRepository.findByLeader(null);
+    return userRepository.findByRankIn(Arrays.asList("总经理", "部门经理"));
   }
 
   public void deleteById(Integer id) {

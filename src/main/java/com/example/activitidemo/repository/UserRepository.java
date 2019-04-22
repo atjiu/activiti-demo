@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
   List<User> findByLeader(String leader);
 
+  List<User> findByRankIn(List<String> ranks);
+
 }

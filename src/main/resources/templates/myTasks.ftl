@@ -23,19 +23,26 @@
     </thead>
     <tbody>
     <#list tasks as item>
-    <tr>
-      <td>${item.id!}</td>
-      <td>${item.name!}</td>
-      <td>${item.description!}</td>
-      <td>${item.executionId!}</td>
-      <td>${item.processInstanceId!}</td>
-      <td>${item.processDefinitionId!}</td>
-      <td>${item.taskDefinitionKey!}</td>
-      <td>${item.createTime?datetime}</td>
-      <td>
-        <button class="btn btn-xs btn-primary" onclick="review('${item.id}')">审批</button>
-      </td>
-    </tr>
+      <tr>
+        <td>${item.task.id!}</td>
+        <td>${item.task.name!}</td>
+        <td>${item.task.description!}</td>
+        <td>${item.task.executionId!}</td>
+        <td>${item.task.processInstanceId!}</td>
+        <td>${item.task.processDefinitionId!}</td>
+        <td>${item.task.taskDefinitionKey!}</td>
+        <td>${item.task.createTime?datetime}</td>
+        <td>
+          <#if item.myTask>
+            <button class="btn btn-xs btn-primary" onclick="review('${item.task.id}')">确定请假
+            </button>
+            <button class="btn btn-xs btn-primary" onclick="completeTask('${item.task.id}', '0')">放弃</button>
+          <#else>
+            <button class="btn btn-xs btn-primary" onclick="review('${item.task.id}')">审批
+            </button>
+          </#if>
+        </td>
+      </tr>
     </#list>
     </tbody>
   </table>
@@ -72,9 +79,10 @@
           </form>
         </div>
         <div class="modal-footer">
-        <#--这地方的按钮应该从流程图里获取-->
+          <#--这地方的按钮应该从流程图里获取-->
           <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-          <button type="button" onclick="completeTask()" class="btn btn-primary">通过</button>
+          <button type="button" onclick="completeTask(undefined, '1')" class="btn btn-primary">通过</button>
+          <button type="button" onclick="completeTask(undefined, '0')" class="btn btn-warning">驳回</button>
         </div>
       </div>
     </div>
@@ -86,23 +94,29 @@
         $("#tbody").html('');
         $.each(data, function (index, item) {
           $("#tbody").append('<tr>' +
-              '<td>' + formatDate(item.time) + '</td>' +
-              '<td>' + item.userId + '</td>' +
-              '<td>' + item.message + '</td>' +
-              '</tr>')
-        })
+            '<td>' + formatDate(item.time) + '</td>' +
+            '<td>' + item.userId + '</td>' +
+            '<td>' + item.message + '</td>' +
+            '</tr>')
+        });
         $("#taskId").val(id);
         $("#showModalBtn").click();
       })
     }
 
-    function completeTask() {
+    function completeTask(id, pass) {
+      if (!id) id = $("#taskId").val();
       $.post('/task/completeTask', {
-        taskId: $("#taskId").val(),
-        content: $("#content").val()
-      }, function (data) {
-        window.location.reload();
-      })
+          taskId: id,
+          content: $("#content").val(),
+          pass: pass
+        },
+
+        function (data) {
+          window.location.reload();
+        }
+      )
     }
+
   </script>
 </@html>

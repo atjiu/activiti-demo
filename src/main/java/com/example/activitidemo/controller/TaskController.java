@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,21 @@ public class TaskController extends BaseController {
 
   @GetMapping("/list")
   public String list(Model model) {
+    List<Map> list = new ArrayList<>();
     List<Task> tasks = taskService.createTaskQuery().taskAssignee(getUser().getUsername()).list();
-    model.addAttribute("tasks", tasks);
+    for (Task task : tasks) {
+      Map map = new HashMap();
+      map.put("task", task);
+      ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+      AskLeave askLeave = askLeaveService.findById(Integer.parseInt(processInstance.getBusinessKey()));
+      if (getUser().getId().equals(askLeave.getUser().getId())) {
+        map.put("myTask", true);
+      } else {
+        map.put("myTask", false);
+      }
+      list.add(map);
+    }
+    model.addAttribute("tasks", list);
     return "myTasks";
   }
 
@@ -58,7 +72,8 @@ public class TaskController extends BaseController {
 
   @PostMapping("/completeTask")
   @ResponseBody
-  public Object completeTask(String taskId, String content) {
+  public Object completeTask(String taskId, String content, String pass) {
+    System.out.println(pass);
     Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
     String processInstanceId = task.getProcessInstanceId();
     // 拿到请假记录的id
@@ -68,6 +83,7 @@ public class TaskController extends BaseController {
     Authentication.setAuthenticatedUserId(getUser().getUsername());
     taskService.addComment(taskId, processInstanceId, content);
     Map<String, Object> variables = new HashMap<>();
+    variables.put("pass", pass);
     if (getUser().getLeader() != null) {
       variables.put("username", getUser().getLeader().getUsername());
     }
