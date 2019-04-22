@@ -34,9 +34,8 @@
         <td>${item.task.createTime?datetime}</td>
         <td>
           <#if item.myTask>
-            <button class="btn btn-xs btn-primary" onclick="review('${item.task.id}')">确定请假
-            </button>
-            <button class="btn btn-xs btn-primary" onclick="completeTask('${item.task.id}', '0')">放弃</button>
+            <button class="btn btn-xs btn-primary" onclick="completeTask('${item.task.id}', '1')">确定请假</button>
+            <button class="btn btn-xs btn-primary" onclick="completeTask('${item.task.id}', '0', '放弃')">放弃</button>
           <#else>
             <button class="btn btn-xs btn-primary" onclick="review('${item.task.id}')">审批
             </button>
@@ -104,12 +103,13 @@
       })
     }
 
-    function completeTask(id, pass) {
+    function completeTask(id, pass, giveup) {
       if (!id) id = $("#taskId").val();
       $.post('/task/completeTask', {
           taskId: id,
           content: $("#content").val(),
-          pass: pass
+          pass: pass,
+          giveup: giveup
         },
 
         function (data) {

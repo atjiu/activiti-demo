@@ -3,6 +3,7 @@ package com.example.activitidemo.controller;
 import com.example.activitidemo.model.AskLeave;
 import com.example.activitidemo.service.AskLeaveService;
 import org.activiti.engine.*;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
@@ -10,6 +11,7 @@ import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,8 +74,7 @@ public class TaskController extends BaseController {
 
   @PostMapping("/completeTask")
   @ResponseBody
-  public Object completeTask(String taskId, String content, String pass) {
-    System.out.println(pass);
+  public Object completeTask(String taskId, String content, String pass, String giveup) {
     Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
     String processInstanceId = task.getProcessInstanceId();
     // 拿到请假记录的id
@@ -87,13 +88,20 @@ public class TaskController extends BaseController {
     if (getUser().getLeader() != null) {
       variables.put("username", getUser().getLeader().getUsername());
     }
+    if (!pass.equals("1")) {
+      // 找到上一个代理人并设置回去
+      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().orderByTaskCreateTime().asc()
+          .processInstanceId(task.getProcessInstanceId())
+          .list();
+      variables.put("username", historicTaskInstances.get(0).getAssignee());
+    }
     taskService.complete(taskId, variables);
     // 判断流程是否走完 重新获取一次流程实例，如果为空 则表示流程结束了
     instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     if (instance == null) {
       // 更新请假状态
       AskLeave askLeave = askLeaveService.findById(askLeaveId);
-      askLeave.setStatus("通过");
+      askLeave.setStatus(StringUtils.isEmpty(giveup) ? "通过" : giveup);
       askLeaveService.save(askLeave);
     }
     return true;

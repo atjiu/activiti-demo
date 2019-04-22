@@ -14,6 +14,7 @@
       <th>ID</th>
       <th>标题</th>
       <th>描述</th>
+      <th>天数</th>
       <th>状态</th>
       <th>日期</th>
       <th>操作</th>
@@ -82,13 +83,14 @@
             optTd = '<button class="btn btn-xs btn-primary" onclick="publishAskLeave(\'' + item.id + '\')">提交请假</button>&nbsp;';
           }
           $("#tbody").append('<tr>' +
-              '<td>' + item.id + '</td>' +
-              '<td>' + item.title + '</td>' +
-              '<td>' + item.description + '</td>' +
-              '<td>' + item.status + '</td>' +
-              '<td>' + item.inTime + '</td>' +
-              '<td>' + optTd + '</td>' +
-              '</tr>');
+            '<td>' + item.id + '</td>' +
+            '<td>' + item.title + '</td>' +
+            '<td>' + item.description + '</td>' +
+            '<td>' + item.day + '</td>' +
+            '<td>' + item.status + '</td>' +
+            '<td>' + item.inTime + '</td>' +
+            '<td>' + optTd + '</td>' +
+            '</tr>');
         });
       })
     }
