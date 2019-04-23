@@ -27,7 +27,7 @@
         var username = $("#username").val();
         var password = $("#password").val();
 
-        $.post('/api/login', {username: username, password: password}, function (data) {
+        $.post('/login', {username: username, password: password}, function (data) {
           if (data) {
             window.location.href = "/"
           }

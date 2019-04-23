@@ -35,7 +35,7 @@
         var password = $("#password").val();
         var rank = $("#rank").val();
 
-        $.post('/api/register', {username: username, password: password, rank: rank}, function (data) {
+        $.post('/register', {username: username, password: password, rank: rank}, function (data) {
           if (data) {
             window.location.href = "/"
           }

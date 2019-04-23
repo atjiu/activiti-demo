@@ -18,8 +18,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
   @Override
   protected void addInterceptors(InterceptorRegistry registry) {
     super.addInterceptors(registry);
-    registry.addInterceptor(userInterceptor).addPathPatterns("/**")
-        .excludePathPatterns("/logout", "/login", "/register", "/api/login", "/api/register");
-    registry.addInterceptor(adminInterceptor).addPathPatterns("/api/workflow/**");
+    registry.addInterceptor(userInterceptor).addPathPatterns("/**").excludePathPatterns("/logout", "/login", "/register", "/api/login", "/api/register");
+    registry.addInterceptor(adminInterceptor).addPathPatterns("/workflow/**");
   }
 }

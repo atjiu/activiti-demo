@@ -1,8 +1,16 @@
 package com.example.activitidemo.controller;
 
-import com.example.activitidemo.model.AskLeave;
-import com.example.activitidemo.service.AskLeaveService;
-import org.activiti.engine.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -17,10 +25,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.example.activitidemo.model.AskLeave;
+import com.example.activitidemo.service.AskLeaveService;
 
 /**
  * Created by tomoya at 2019/4/22
@@ -46,12 +52,13 @@ public class TaskController extends BaseController {
 
   @GetMapping("/list")
   public String list(Model model) {
-    List<Map> list = new ArrayList<>();
+    List<Map<String, Object>> list = new ArrayList<>();
     List<Task> tasks = taskService.createTaskQuery().taskAssignee(getUser().getUsername()).list();
     for (Task task : tasks) {
-      Map map = new HashMap();
+      Map<String, Object> map = new HashMap<>();
       map.put("task", task);
-      ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+      ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(task.getProcessInstanceId()).singleResult();
       AskLeave askLeave = askLeaveService.findById(Integer.parseInt(processInstance.getBusinessKey()));
       if (getUser().getId().equals(askLeave.getUser().getId())) {
         map.put("myTask", true);
@@ -78,7 +85,8 @@ public class TaskController extends BaseController {
     Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
     String processInstanceId = task.getProcessInstanceId();
     // 拿到请假记录的id
-    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId)
+        .singleResult();
     Integer askLeaveId = Integer.parseInt(instance.getBusinessKey());
 
     Authentication.setAuthenticatedUserId(getUser().getUsername());
@@ -90,9 +98,8 @@ public class TaskController extends BaseController {
     }
     if (!pass.equals("1")) {
       // 找到上一个代理人并设置回去
-      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().orderByTaskCreateTime().asc()
-          .processInstanceId(task.getProcessInstanceId())
-          .list();
+      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
+          .orderByTaskCreateTime().asc().processInstanceId(task.getProcessInstanceId()).list();
       variables.put("username", historicTaskInstances.get(0).getAssignee());
     }
     taskService.complete(taskId, variables);

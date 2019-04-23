@@ -20,7 +20,22 @@
       <th>操作</th>
     </tr>
     </thead>
-    <tbody id="tbody">
+    <tbody>
+    <#list askLeaves as item>
+    <tr>
+      <td>${item.id?c}</td>
+      <td>${item.title!}</td>
+      <td>${item.description!}</td>
+      <td>${item.day!}</td>
+      <td>${item.status!}</td>
+      <td>${item.inTime!}</td>
+      <td>
+        <#if item.status == "创建">
+          <button class="btn btn-xs btn-primary" onclick="publishAskLeave(${item.id?c})">提交请假</button>
+        </#if>
+      </td>
+    </tr>
+    </#list>
     </tbody>
   </table>
 
@@ -72,32 +87,9 @@
       })
     });
 
-    loadAskLeaves();
-
-    function loadAskLeaves() {
-      $.post("/api/askLeave/list", function (data) {
-        $("#tbody").html('');
-        $.each(data, function (index, item) {
-          var optTd = '';
-          if (item.status === "创建") {
-            optTd = '<button class="btn btn-xs btn-primary" onclick="publishAskLeave(\'' + item.id + '\')">提交请假</button>&nbsp;';
-          }
-          $("#tbody").append('<tr>' +
-            '<td>' + item.id + '</td>' +
-            '<td>' + item.title + '</td>' +
-            '<td>' + item.description + '</td>' +
-            '<td>' + item.day + '</td>' +
-            '<td>' + item.status + '</td>' +
-            '<td>' + item.inTime + '</td>' +
-            '<td>' + optTd + '</td>' +
-            '</tr>');
-        });
-      })
-    }
-
     function publishAskLeave(id) {
       if (confirm("确定要提交请假吗？")) {
-        $.post("/api/askLeave/commit", {id: id}, function (data) {
+        $.post("/askLeave/commit", {id: id}, function () {
           window.location.reload();
         })
       }
