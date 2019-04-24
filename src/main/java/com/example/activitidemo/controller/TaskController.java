@@ -1,22 +1,18 @@
 package com.example.activitidemo.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import com.example.activitidemo.model.AskLeave;
+import com.example.activitidemo.service.AskLeaveService;
+import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -25,8 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.activitidemo.model.AskLeave;
-import com.example.activitidemo.service.AskLeaveService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tomoya at 2019/4/22
@@ -57,26 +55,23 @@ public class TaskController extends BaseController {
     for (Task task : tasks) {
       Map<String, Object> map = new HashMap<>();
       map.put("task", task);
-      ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-          .processInstanceId(task.getProcessInstanceId()).singleResult();
-      AskLeave askLeave = askLeaveService.findById(Integer.parseInt(processInstance.getBusinessKey()));
+      ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task
+          .getProcessInstanceId()).singleResult();
+      Integer askLeaveId = Integer.parseInt(processInstance.getBusinessKey());
+      AskLeave askLeave = askLeaveService.findById(askLeaveId);
       if (getUser().getId().equals(askLeave.getUser().getId())) {
         map.put("myTask", true);
       } else {
         map.put("myTask", false);
       }
+      map.put("askLeave", askLeave);
+      // 查询批注信息
+      List<Comment> comments = taskService.getProcessInstanceComments(task.getProcessInstanceId());
+      map.put("comments", comments);
       list.add(map);
     }
     model.addAttribute("tasks", list);
     return "myTasks";
-  }
-
-  @PostMapping("/queryTaskComments")
-  @ResponseBody
-  public Object queryTaskComments(String taskId) {
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-    List<Comment> comments = taskService.getProcessInstanceComments(task.getProcessInstanceId());
-    return comments;
   }
 
   @PostMapping("/completeTask")
@@ -89,6 +84,10 @@ public class TaskController extends BaseController {
         .singleResult();
     Integer askLeaveId = Integer.parseInt(instance.getBusinessKey());
 
+    // 如果放弃了增加日志
+    if (!StringUtils.isEmpty(giveup)) {
+      content = "[" + giveup + "]" + content;
+    }
     Authentication.setAuthenticatedUserId(getUser().getUsername());
     taskService.addComment(taskId, processInstanceId, content);
     Map<String, Object> variables = new HashMap<>();
@@ -112,6 +111,27 @@ public class TaskController extends BaseController {
       askLeaveService.save(askLeave);
     }
     return true;
+  }
+
+  @GetMapping(value = "/queryProcessDefResource", produces = MediaType.IMAGE_PNG_VALUE)
+  @ResponseBody
+  public FileSystemResource queryProcessDefResource(String taskId) {
+    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(task
+        .getProcessInstanceId()).singleResult();
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(instance
+        .getProcessDefinitionId()).singleResult();
+    return new FileSystemResource(definition.getDiagramResourceName());
+  }
+
+  private Map<String, Object> queryTaskActivity(String taskId) {
+    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(task
+        .getProcessInstanceId()).singleResult();
+    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(instance
+        .getProcessDefinitionId());
+    //    definition.fin
+    return null;
   }
 
 }

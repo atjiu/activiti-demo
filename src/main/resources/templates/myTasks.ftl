@@ -12,36 +12,75 @@
     <tr>
       <th>任务ID</th>
       <th>任务名</th>
-      <th>描述</th>
-      <th>执行ID</th>
-      <th>实例ID</th>
-      <th>定义ID</th>
-      <th>任务定义Key</th>
-      <th>创建时间</th>
+      <th>执行人</th>
+      <th>时间</th>
       <th>操作</th>
     </tr>
     </thead>
     <tbody>
     <#list tasks as item>
-      <tr>
-        <td>${item.task.id!}</td>
-        <td>${item.task.name!}</td>
-        <td>${item.task.description!}</td>
-        <td>${item.task.executionId!}</td>
-        <td>${item.task.processInstanceId!}</td>
-        <td>${item.task.processDefinitionId!}</td>
-        <td>${item.task.taskDefinitionKey!}</td>
-        <td>${item.task.createTime?datetime}</td>
-        <td>
-          <#if item.myTask>
-            <button class="btn btn-xs btn-primary" onclick="completeTask('${item.task.id}', '1')">确定请假</button>
-            <button class="btn btn-xs btn-primary" onclick="completeTask('${item.task.id}', '0', '放弃')">放弃</button>
-          <#else>
-            <button class="btn btn-xs btn-primary" onclick="review('${item.task.id}')">审批
+    <tr>
+      <td>${item.task.id!}</td>
+      <td>${item.task.name!}</td>
+      <td>${item.task.assignee!}</td>
+      <td>${item.task.createTime?string('yyyy-MM-dd HH:mm:ss')}</td>
+      <td>
+        <button class="btn btn-xs btn-primary" onclick="review('${item.task.id}')">处理</button>&nbsp;
+        <button class="btn btn-xs btn-info" onclick="showTaskProcessImage(${item.task.id})">显示流程图</button>
+        <div class="hidden" id="taskProcessTable_${item.task.id}">
+          <h4>请假信息</h4>
+          <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>请假人</th>
+              <th>标题</th>
+              <th>描述</th>
+              <th>天数</th>
+              <th>时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>${item.askLeave.user.username}</td>
+              <td>${item.askLeave.title!}</td>
+              <td>${item.askLeave.description!}</td>
+              <td>${item.askLeave.day!}</td>
+              <td>${item.askLeave.inTime?string('yyyy-MM-dd HH:mm:ss')}</td>
+            </tr>
+            </tbody>
+          </table>
+          <textarea class="form-control" name="content" rows="3" placeholder="批注"></textarea>
+          <h4>批注信息</h4>
+          <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>时间</th>
+              <th>受理人</th>
+              <th>批注</th>
+            </tr>
+            </thead>
+            <tbody>
+            <#list item.comments as comment>
+            <tr>
+              <td>${comment.time?string('yyyy-MM-dd HH:mm:ss')}</td>
+              <td>${comment.userId!}</td>
+              <td>${comment.message!}</td>
+            </tr>
+            </#list>
+            </tbody>
+          </table>
+          <p class="text-center">
+            <#if item.askLeave.user.username == _user.username>
+              <button class="btn btn-sm btn-warning" onclick="completeTask('${item.task.id}', '0', '放弃')">放弃</button>
+            </#if>
+            <button type="button" onclick="completeTask('${item.task.id}', '1')" class="btn btn-sm btn-success">通过
             </button>
-          </#if>
-        </td>
-      </tr>
+            <button type="button" onclick="completeTask('${item.task.id}', '0')" class="btn btn-sm btn-danger">驳回
+            </button>
+          </p>
+        </div>
+      </td>
+    </tr>
     </#list>
     </tbody>
   </table>
@@ -58,6 +97,10 @@
           <form action="" onsubmit="return;" id="form" method="post" role="form">
 
             <input type="hidden" id="taskId" value=""/>
+
+            <div class="form-group">
+              <label for="">标题</label>
+            </div>
 
             <div class="form-group">
               <label for="">批注</label>
@@ -78,7 +121,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <#--这地方的按钮应该从流程图里获取-->
+        <#--这地方的按钮应该从流程图里获取-->
           <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
           <button type="button" onclick="completeTask(undefined, '1')" class="btn btn-primary">通过</button>
           <button type="button" onclick="completeTask(undefined, '0')" class="btn btn-warning">驳回</button>
@@ -89,33 +132,35 @@
 
   <script>
     function review(id) {
-      $.post('/task/queryTaskComments', {taskId: id}, function (data) {
-        $("#tbody").html('');
-        $.each(data, function (index, item) {
-          $("#tbody").append('<tr>' +
-            '<td>' + formatDate(item.time) + '</td>' +
-            '<td>' + item.userId + '</td>' +
-            '<td>' + item.message + '</td>' +
-            '</tr>')
-        });
-        $("#taskId").val(id);
-        $("#showModalBtn").click();
-      })
+      layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['600px', 'auto'], //宽高
+        content: '<div style="padding: 20px;" id="review_div_' + id + '">' + $("#taskProcessTable_" + id).html() + '</div>'
+      });
     }
 
     function completeTask(id, pass, giveup) {
-      if (!id) id = $("#taskId").val();
+      var content = $("#review_div_" + id).find('textarea[name="content"]').val();
       $.post('/task/completeTask', {
-          taskId: id,
-          content: $("#content").val(),
-          pass: pass,
-          giveup: giveup
-        },
-
-        function (data) {
-          window.location.reload();
-        }
+            taskId: id,
+            content: content,
+            pass: pass,
+            giveup: giveup
+          },
+          function (data) {
+            window.location.reload();
+          }
       )
+    }
+
+    function showTaskProcessImage(id) {
+      layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['600px', '600px'], //宽高
+        content: '<img width="580" src="/task/queryProcessDefResource?taskId=' + id + '"/>'
+      });
     }
 
   </script>

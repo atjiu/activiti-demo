@@ -24,7 +24,7 @@
       <td>${item.name!}</td>
       <td>${item.category!}</td>
       <td>${item.key!}</td>
-      <td>${item.deploymentTime?datetime}</td>
+      <td>${item.deploymentTime?string('yyyy-MM-dd HH:mm:ss')}</td>
     </tr>
     </#list>
     </tbody>

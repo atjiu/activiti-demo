@@ -25,7 +25,7 @@
       <td>${item.processDefinitionId!}</td>
       <td>${item.processDefinitionKey!}</td>
       <td>${item.description!}</td>
-      <td>${item.startTime?datetime}</td>
+      <td>${item.startTime?string('yyyy-MM-dd HH:mm:ss')}</td>
       <td>${item.deploymentId!}</td>
     </tr>
     </#list>

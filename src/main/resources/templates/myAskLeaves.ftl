@@ -23,15 +23,39 @@
     <tbody>
     <#list askLeaves as item>
     <tr>
-      <td>${item.id?c}</td>
-      <td>${item.title!}</td>
-      <td>${item.description!}</td>
-      <td>${item.day!}</td>
-      <td>${item.status!}</td>
-      <td>${item.inTime!}</td>
+      <td>${item.askLeave.id?c}</td>
+      <td>${item.askLeave.title!}</td>
+      <td>${item.askLeave.description!}</td>
+      <td>${item.askLeave.day!}</td>
+      <td>${item.askLeave.status!}</td>
+      <td>${item.askLeave.inTime!}</td>
       <td>
-        <#if item.status == "创建">
-          <button class="btn btn-xs btn-primary" onclick="publishAskLeave(${item.id?c})">提交请假</button>
+        <#if item.askLeave.status == "创建">
+          <button class="btn btn-xs btn-primary" onclick="publishAskLeave(${item.askLeave.id?c})">提交请假</button>
+        <#else>
+          <button class="btn btn-xs btn-info" onclick="showAskLeaveProcess(${item.askLeave.id?c})">查看处理流程</button>
+          <div class="hidden" id="askLeaveProcessTable_${item.askLeave.id?c}">
+            <table class="table table-bordered table-hover">
+              <thead>
+              <tr>
+                <th>时间</th>
+                <th>受理人</th>
+                <th>批注内容</th>
+              </tr>
+              </thead>
+              <tbody>
+                <#if item.comments??>
+                  <#list item.comments as comment>
+                  <tr>
+                    <td>${comment.time?string('yyyy-MM-dd HH:mm:ss')}</td>
+                    <td>${comment.userId!}</td>
+                    <td>${comment.message!}</td>
+                  </tr>
+                  </#list>
+                </#if>
+              </tbody>
+            </table>
+          </div>
         </#if>
       </td>
     </tr>
@@ -77,7 +101,7 @@
       var title = $("#title").val();
       var description = $("#description").val();
       var day = $("#day").val();
-      $.post("/api/askLeave/add", {
+      $.post("/askLeave/add", {
         title: title,
         description: description,
         status: '创建',
@@ -93,6 +117,15 @@
           window.location.reload();
         })
       }
+    }
+
+    function showAskLeaveProcess(id) {
+      layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['600px', 'auto'], //宽高
+        content: '<div style="padding: 20px;">' + $("#askLeaveProcessTable_" + id).html() + '</div>'
+      });
     }
   </script>
 </@html>
