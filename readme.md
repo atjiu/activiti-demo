@@ -45,3 +45,7 @@ VALUES
 ## 博客
 
 关于 Activiti 的相关博客可以查看 [activiti学习笔记](https://tomoya92.github.io/category/#activiti%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0)
+
+## 贡献
+
+本项目现在只内置了一个请假流程的实现，如果你对流程控制感兴趣，或者正在学习，欢迎以本项目为例开发其它功能的流程，然后pr到本项目
