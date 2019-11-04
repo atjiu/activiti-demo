@@ -32,12 +32,12 @@ create database `activiti-demo` CHARACTER SET 'utf8';
 执行下面sql初始化用户关系
 
 ```sql
-INSERT INTO `activiti-demo`.`user`(`id`, `in_time`, `password`, `rank`, `username`, `leader_id`) VALUES (1, '2019-04-22 19:14:12', '123123', '管理员', 'admin', NULL);
+--INSERT INTO `activiti-demo`.`user`(`id`, `in_time`, `password`, `rank`, `username`, `leader_id`) VALUES (1, '2019-04-22 19:14:12', '123123', '管理员', 'admin', NULL);
 INSERT INTO `user` (`id`, `password`, `rank`, `username`, `leader_id`, `in_time`)
 VALUES
 	(1, '123123', '管理员', 'admin', NULL, '2019-04-22 14:19:23'),
-	(2, '123123', '部门经理', 'user2', 3, '2019-04-22 14:19:23'),
 	(3, '123123', '总经理', 'user1', NULL, '2019-04-22 14:19:23'),
+	(2, '123123', '部门经理', 'user2', 3, '2019-04-22 14:19:23'),
 	(5, '123123', '员工', 'user3', 2, '2019-04-22 14:21:38'),
 	(6, '123123', '员工', 'user4', 2, '2019-04-22 14:22:56');
 ```
